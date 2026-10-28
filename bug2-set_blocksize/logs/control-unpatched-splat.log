@@ -561,4 +561,44 @@ trfs_mnt successfully.
 [   43.315743] locks held by repro-blk/189: 3, last CPU#2:
 [   43.317247]  #0: ffff8d3e432a1628 (sb_internal#2){.+.+}-{0:0}, at: btrfs_init_new_device+0x315/0x17a0
 [   43.320172]  #1: ffff8d3e430a6678 (btrfs_trans_num_writers){.+.+}-{0:0}, at: join_transaction+0x1c3/0x5f0
-[   43.323182]  #2: ffff8
+[   43.323182]  #2: ffff8d3e430a66a0 (btrfs_trans_num_extwriters){.+.+}-{0:0}, at: join_transaction+0x1c3/0x5f0
+[   43.326396] 
+[   43.326396] stack backtrace:
+[   43.327916] CPU: 2 UID: 0 PID: 189 Comm: repro-blk Not tainted 7.3.0-rc7-next-20261014-gd419d682257d #4 PREEMPT(lazy) 
+[   43.331162] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   43.333952] Call Trace:
+[   43.334652]  <TASK>
+[   43.335358]  dump_stack_lvl+0x66/0xa0
+[   43.336553]  print_circular_bug+0x2ca/0x400
+[   43.337886]  check_noncircular+0x146/0x160
+[   43.339313]  check_prev_add+0xeb/0xe80
+[   43.340527]  __lock_acquire+0x1429/0x1b00
+[   43.341807]  lock_acquire+0xcd/0x2d0
+[   43.342951]  ? set_blocksize+0xa5/0x120
+[   43.344231]  ? btrfs_init_metadata_block_rsv+0x66/0x80
+[   43.345914]  down_write+0x24/0xb0
+[   43.346982]  ? set_blocksize+0xa5/0x120
+[   43.348207]  set_blocksize+0xa5/0x120
+[   43.349418]  btrfs_init_new_device+0x3b5/0x17a0
+[   43.350898]  ? find_held_lock+0x2b/0x80
+[   43.352130]  ? __might_fault+0x2b/0x70
+[   43.353344]  ? lock_release+0xc6/0x280
+[   43.354542]  ? __might_fault+0x2b/0x70
+[   43.355775]  ? _copy_from_user+0x48/0x90
+[   43.357054]  btrfs_ioctl_add_dev+0x9e/0x420
+[   43.358143]  __x64_sys_ioctl+0x91/0xe0
+[   43.359254]  do_syscall_64+0x109/0x5e0
+[   43.360270]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[   43.361701] RIP: 0033:0x41dc2d
+[   43.362516] Code: 04 25 28 00 00 00 48 89 45 c8 31 c0 48 8d 45 10 c7 45 b0 10 00 00 00 48 89 45 b8 48 8d 45 d0 48 89 45 c0 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1a 48 8b 45 c8 64 48 2b 04 25 28 00 00 00
+[   43.367387] RSP: 002b:00007ffc2d52db10 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+[   43.369210] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 000000000041dc2d
+[   43.370985] RDX: 00007ffc2d52ead0 RSI: 000000005000940a RDI: 0000000000000003
+[   43.372688] RBP: 00007ffc2d52db60 R08: 0000000000000050 R09: 0000000000000000
+[   43.374467] R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffc2d52ead0
+[   43.376249] R13: 00007ffc2d52e3d0 R14: 00007ffc2d52e210 R15: 00007ffc2d52e050
+[   43.378093]  </TASK>
+[  166.419083] clocksource: Watchdog remote CPU 3 read timed out
+qemu-system-x86_64: terminating on signal 15 from pid 18418 ()
+
+Script done on 2026-10-28 11:25:42+00:00 [COMMAND_EXIT_CODE="0"]

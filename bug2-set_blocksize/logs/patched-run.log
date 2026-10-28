@@ -409,4 +409,74 @@ Booting from ROM..c[?7l[2J[0m.[    0.000000] Linux version 7.3.0-rc7-next-20
 [    1.605602] md: Autodetecting RAID arrays.
 [    1.605630] md: autorun ...
 [    1.605631] md: ... autorun DONE.
-[ 
+[    1.616890] EXT4-fs (sda1): mounted filesystem 4f91c6db-4997-4bb4-91b8-7e83a20c1bf1 r/w with ordered data mode. Quota mode: none.
+[    1.617015] VFS: Mounted root (ext4 filesystem) on device 8:1.
+[    1.617314] devtmpfs: mounted
+[    1.617463] VFS: Pivoted into new rootfs
+[    1.620059] Freeing unused kernel image (initmem) memory: 3456K
+[    1.621385] Write protecting the kernel read-only data: 34816k
+[    1.629019] Freeing unused kernel image (text/rodata gap) memory: 1512K
+[    1.629800] Freeing unused kernel image (rodata/data gap) memory: 1520K
+[    1.684898] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.684902] x86/mm: Checking user space page tables
+[    1.736136] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.736148] Run /sbin/init as init process
+[    1.757349] mount (84) used greatest stack depth: 12512 bytes left
+[    1.768099] EXT4-fs (sda1): re-mounted 4f91c6db-4997-4bb4-91b8-7e83a20c1bf1.
+[    1.769061] mount (85) used greatest stack depth: 12488 bytes left
+mount: mounting devtmpfs on /dev failed: Device or resource busy
+mount: mounting securityfs on /sys/kernel/security failed: No such file or directory
+mount: mounting configfs on /sys/kernel/config/ failed: No such file or directory
+mount: mounting smackfs on /sys/fs/smackfs failed: No such file or directory
+mount: mounting selinuxfs on /sys/fs/selinux failed: No such file or directory
+mount: mounting fusectl on /sys/fs/fuse/connections failed: No such file or directory
+mount: mounting pstore on /sys/fs/pstore failed: No such file or directory
+mount: mounting bpf on /sys/fs/bpf failed: No such file or directory
+Starting syslogd: OK
+Starting acpid: OK
+[    1.827894] acpid (102) used greatest stack depth: 12032 bytes left
+Starting klogd: OK
+Running sysctl: OK
+Populating /dev using udev: [    1.864499] udevd[117]: starting version 3.2.14
+[    1.880615] udevd[118]: starting eudev-3.2.14
+done
+Starting system message bus: done
+Starting iptables: OK
+Starting network: OK
+Starting dhcpcd...
+dhcpcd-10.2.0 starting
+dev: loaded udev
+no valid interfaces found
+Starting crond: OK
+Starting sshd: OK
+
+syzkaller
+syzkaller login: root
+# V[Juname -a
+Linux syzkaller 7.3.0-rc7-next-20261014-gd419d682257d-dirty #5 SMP PREEMPT_DYNAMIC Wed Oct 28 10:44:17 GMT 2026 x86_64 GNU/Linux
+# ./repro-blk
+[*] Starting BTRFS deadlock reproducer...
+[+] Allocated 16 MiB image buffer.
+[+] Constructed valid BTRFS image in memory.
+[+] Written 16 MiB image to /tmp/btrfs.img.
+[+][   30.985357] loop0: detected capacity change from 0 to 32768
+ Created target image at /tmp/target.img (size: 33555456).
+[+] Bound /tmp/btrfs[   30.988871] loop1: detected capacity change from 0 to 65538
+.img to /dev/loop0 and closed fds.
+[+] Set block size of /dev/loop1 to 1024.
+[+] Bound /tmp/target.img to /dev/loop1 (bsz=1024) and closed fds.
+[+] Step 1: Read 4096 bytes from /dev/loop0 (registered bd_inode -> mmap_lock).
+[+] Step 1b: Read from /dev/loo[   30.998303] BTRFS: device fsid 42424242-4242-4242-4242-424242424242 devid 1 transid 1 /dev/loop0 (7:0) scanned by repro-blk (190)
+p1 and closed.
+[   31.005125] BTRFS info (device loop0): first mount of filesystem 42424242-4242-4242-4242-424242424242
+[   31.005141] BTRFS info (device loop0): using crc32c checksum algorithm
+[   31.015328] BTRFS info (device loop0): enabling ssd optimizations
+[   31.015336] BTRFS info (device loop0): turning on async discard
+[+] Mounted /dev/loop0 at /tmp/btrfs_mnt successfully.
+[+] Step 2: Mmapped /tmp/btrfs_mnt/testfile successfully (registered mmap_lock -> writers).
+[+] Step 3: Created directory /tmp/btrfs_mnt/testdir (registered writers -> extwriters).
+[*] Step 4: Executing ioctl(BTRFS_IOC_ADD_DEV, /dev/loop1) to complete cycle...
+[  266.427563] clocksource: Watchdog remote CPU 3 read timed out
+qemu-system-x86_64: terminating on signal 15 from pid 18418 ()
+
+Script done on 2026-10-28 11:25:42+00:00 [COMMAND_EXIT_CODE="0"]
