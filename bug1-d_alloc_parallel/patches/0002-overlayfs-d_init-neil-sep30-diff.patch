@@ -1,0 +1,47 @@
+diff --git a/fs/overlayfs/super.c b/fs/overlayfs/super.c
+index bd0a3f903..7b9878fcf 100644
+--- a/fs/overlayfs/super.c
++++ b/fs/overlayfs/super.c
+@@ -163,10 +163,34 @@ static int ovl_dentry_weak_revalidate(struct dentry *dentry, unsigned int flags)
+ 	return ovl_dentry_revalidate_common(dentry, flags, true);
+ }
+ 
++#ifdef CONFIG_LOCKDEP
++#define OVL_MAX_NESTING FILESYSTEM_MAX_STACK_DEPTH
++static int ovl_dentry_init(struct dentry *dentry)
++{
++	static struct lock_class_key ovl_d_lock_key[OVL_MAX_NESTING];
++	int depth = dentry->d_sb->s_stack_depth - 1;
++
++	if (WARN_ON_ONCE(depth < 0 || depth >= OVL_MAX_NESTING))
++		depth = 0;
++
++	/* Based on lockdep_set_class() */
++	lockdep_init_map_type(&dentry->lookup_map, "DCACHE_PAR_LOOKUP_OVL",
++			      &ovl_d_lock_key[depth], 0,
++			      dentry->lookup_map.wait_type_inner,
++			      dentry->lookup_map.wait_type_outer,
++			      dentry->lookup_map.lock_type);
++
++	return 0;
++}
++#else
++#define ovl_dentry_init NULL
++#endif
++
+ static const struct dentry_operations ovl_dentry_operations = {
+ 	.d_real = ovl_d_real,
+ 	.d_revalidate = ovl_dentry_revalidate,
+ 	.d_weak_revalidate = ovl_dentry_weak_revalidate,
++	.d_init = ovl_dentry_init,
+ };
+ 
+ #if IS_ENABLED(CONFIG_UNICODE)
+@@ -176,6 +200,7 @@ static const struct dentry_operations ovl_dentry_ci_operations = {
+ 	.d_weak_revalidate = ovl_dentry_weak_revalidate,
+ 	.d_hash = generic_ci_d_hash,
+ 	.d_compare = generic_ci_d_compare,
++	.d_init = ovl_dentry_init,
+ };
+ #endif
+ 

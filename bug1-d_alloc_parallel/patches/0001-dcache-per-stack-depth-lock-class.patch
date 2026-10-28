@@ -1,0 +1,22 @@
+diff --git a/fs/dcache.c b/fs/dcache.c
+index 736402071..c151a0f54 100644
+--- a/fs/dcache.c
++++ b/fs/dcache.c
+@@ -1916,7 +1916,7 @@ EXPORT_SYMBOL(d_invalidate);
+  
+ static struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
+ {
+-	static struct lock_class_key __lookup_key;
++	static struct lock_class_key __lookup_key[FILESYSTEM_MAX_STACK_DEPTH + 1];
+ 	struct dentry *dentry;
+ 	char *dname;
+ 	int err;
+@@ -1978,7 +1978,7 @@ static struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
+ 	dentry->waiters = NULL;
+ 	INIT_HLIST_NODE(&dentry->d_sib);
+ 
+-	lockdep_init_map(&dentry->lookup_map, "DCACHE_PAR_LOOKUP", &__lookup_key, 0);
++	lockdep_init_map(&dentry->lookup_map, "DCACHE_PAR_LOOKUP", &__lookup_key[sb->s_stack_depth], 0);
+ 
+ 	if (dentry->d_op && dentry->d_op->d_init) {
+ 		err = dentry->d_op->d_init(dentry);
