@@ -23,7 +23,7 @@ otherwise unchanged: the return value is ignored, as before.
 | Kernel | Result | Log |
 |--------|--------|-----|
 | unpatched | lockdep splat at the ADD_DEV ioctl | `logs/control-unpatched-splat.log` |
-| patched | no lockdep splat | `logs/patched-*.log` |
+| patched | no lockdep splat | `logs/patched-run.log` |
 
 ## Caveat
 
