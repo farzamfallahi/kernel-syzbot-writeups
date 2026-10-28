@@ -27,17 +27,25 @@ otherwise unchanged: the return value is ignored, as before.
 
 ## Caveat
 
-On the patched kernel the ioctl never returns. A diagnostic run shows the task
-self-deadlocked on one chunk-tree extent buffer while inserting the dev item.
-The syzbot reproducer builds its btrfs image by hand, and my working
-hypothesis is that the image does not account for its own chunk-tree block in
-the extent tree, so the allocator hands that block out again. I have not
-confirmed this, and I have not yet checked whether the unpatched kernel hangs
-at the same point. Until I do, I am only claiming that the patch removes the
-lockdep splat.
+On the patched kernel the ioctl never returns. A diagnostic run
+(`logs/patched-vm-patched-diag.log`) shows the task self-deadlocked on one
+chunk-tree extent buffer, locked twice, while inserting the dev item.
+
+The unpatched control kernel behaves the same way after printing the splat:
+its log shows no output after the splat and a clocksource watchdog timeout at
+166 s (`logs/control-unpatched-splat.log`), the same symptom as the patched
+run (266 s). I did not capture a stack trace on the unpatched kernel, so I
+cannot prove it is stuck at the identical point.
+
+The syzbot reproducer builds its btrfs image by hand. My working hypothesis is
+that the image does not account for its own chunk-tree block in the extent
+tree, so the allocator hands that block out again. I have not confirmed this.
+
+What I claim: the patch removes the lockdep splat. The hang appears to be
+separate behaviour of the reproducer, not something the patch introduced.
 
 ## Not done yet
 
-- Control run of the hang on the unpatched kernel.
+- Capture a stack trace of the hang on the unpatched kernel to confirm it is the same location.
 - Check lore and the btrfs/block trees for an existing fix.
 - Submit to linux-btrfs.
